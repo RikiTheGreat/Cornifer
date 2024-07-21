@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Cornifer");
 
     _finder = new Finder;
     _finder->moveToThread(&_finderThread);
