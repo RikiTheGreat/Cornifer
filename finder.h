@@ -7,8 +7,7 @@
 #include <QObject>
 #include <QThread>
 #include <atomic>
-#include <condition_variable>
-#include <mutex>
+
 
 class Finder : public QObject
 {
@@ -21,14 +20,19 @@ signals:
 public slots:
     void startTask();
     void stopTask();
+    void setData(QString const& file, QString const& dir);
 
 private:
     bool actualTask();
     void update();
+    void findFiles();
+
 private:
     std::atomic<bool> _isRunning;
     QStringList _files;
     QThread *_t;
+    QString _fileName;
+    QString _path;
 };
 
 #endif // FINDER_H

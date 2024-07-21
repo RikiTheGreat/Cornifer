@@ -23,7 +23,7 @@ public:
 
 private slots:
     void toggleTask();
-    void taskFinished(QStringList  files);
+    void taskFinished(QStringList  const& files);
 private:
 
 

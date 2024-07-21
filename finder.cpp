@@ -1,5 +1,8 @@
 #include "finder.h"
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
+#include <QDirIterator>
 
 Finder::Finder(QObject *parent)
     : QObject{parent}
@@ -41,17 +44,17 @@ void Finder::stopTask()
     qDebug() << "Stopping task in thread:" << QThread::currentThreadId();
 }
 
+void Finder::setData(const QString &file, const QString &dir)
+{
+    _fileName = file;
+    _path = dir;
+}
+
 bool Finder::actualTask()
 {
     _files.clear();
-    for (int i = 0; i < 5; ++i) {
-        if (!_isRunning.load()) {
-            break;
-        }
-        _files.append(QString::number(i));
-        QThread::sleep(1);
-    }
 
+    findFiles();
     return true;
 }
 
@@ -63,4 +66,27 @@ void Finder::update()
             _isRunning.store(false);
         }
     }
+}
+
+void Finder::findFiles()
+{
+        QDir dir(_path);
+        if(!dir.exists()) {
+            qWarning() << "Invalid Path: " << _path;
+            _isRunning.store(false);
+        }
+
+        if(_fileName.isEmpty()) {
+            qWarning() << "Empty name: " << _fileName;
+            _isRunning.store(false);
+        }
+        QDirIterator it (dir, QDirIterator::Subdirectories);
+        while(it.hasNext()) {
+            QFileInfo fileInfo = it.nextFileInfo();
+            if(fileInfo.fileName().contains(_fileName) || fileInfo.fileName() == _fileName) {
+                _files.append(fileInfo.absolutePath() + QDir::separator() + fileInfo.fileName());
+            }
+        }
+        _isRunning.store(false);
+
 }
